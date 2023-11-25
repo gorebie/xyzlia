@@ -1,6 +1,6 @@
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection,  Events, GatewayIntentBits,} = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits,} = require('discord.js');
 const { token } = require('./config.json');
 
 
@@ -8,35 +8,19 @@ const client = new Client({ intents:
 	[GatewayIntentBits.Guilds] });
 
 client.commands= new Collection();
-const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
+const commandsPath = path.join(__dirname, 'commands');
+const commandFiles = fs.readdirSync(commandsPath);
 
-for (const folder of commandFolders) {
-    const comandsPath = path.join(foldersPath, folder);
-    const commandFiles = fs.readdirSync(comandsPath).filter(file => file.endsWith('.js'));
-    for (constfile of commandFiles) {
-        const filePath = path.join(comandsPath, file);
+for (const file of commandFiles) {
+        const filePath = path.join(commandsPath, file);
+		const importName = path.basename(file, path.extname(file));
         const command = require(filePath);
         if ('data' in command && 'execute' in command) {
-            command.push(command.data.toJSON());
+            client.commands.set(importName,command);
         } else { 
             console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
         }
      }
-}
-
-const eventsPath = path.join(__dirname, 'events');
-const eventsFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
-
-for (const file of eventsFiles) {
-	const filePath = path.join(eventsPath, file);
-	const event = require(filePath);
-	if(event.once) {
-		client.once(event.name, (...args) => event.execute(...args));
-	} else {
-		client.on(event.name, (...args) => event.execute(...args));
-	}
-}
 
 	// When the client is ready, run this code (only once)
 // We use 'c' for the event parameter to keep it separate from the already defined 'client'

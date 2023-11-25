@@ -7,6 +7,6 @@ module.exports = {
     async execute(interaction) {
         // interaction.user is the objoect representing the User who ran the command
         // interaction.member is the GuildMember object, which repressents the user in the specific guild
-        await interaction.reply(`This command was run by ${interaction.user.username}, who joined on ${interaction.member.joinedAT}.`);
+        await interaction.reply(`This command was run by ${interaction.user.username}, who joined on ${interaction.member.joinedAt}.`);
     },
 };
